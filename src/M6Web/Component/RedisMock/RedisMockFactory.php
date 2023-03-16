@@ -231,7 +231,7 @@ CONSTRUCTOR;
      * @throws ReflectionException
      * @throws UnsupportedException
      */
-    public function getAdapter($classToExtend, $failOnlyAtRuntime = false, $orphanizeConstructor = true, $storage = '', array $constructorParams = []): RedisMock
+    public function getAdapter($classToExtend, $failOnlyAtRuntime = false, $orphanizeConstructor = true, $storage = '', array $constructorParams = [])
     {
         [$namespace, $newClassName, $class] = $this->getAdapterClassName($classToExtend, $orphanizeConstructor);
 
@@ -281,7 +281,7 @@ CONSTRUCTOR;
     }
 
     /**
-     * @throws UnsupportedException
+     * @throws UnsupportedException|ReflectionException
      */
     protected function getClassCode($namespace, $newClassName, ReflectionClass $class, $orphanizeConstructor = false, $failOnlyAtRuntime = false): string
     {
@@ -347,8 +347,16 @@ CONSTRUCTOR;
             if ($parameter->isPassedByReference()) {
                 $signature .= '&';
             }
+            // variadic
+            if ($parameter->isVariadic()) {
+                $signature .= '...';
+            }
             // paramName
             $signature .= '$' . $parameter->getName();
+            // optional, variadic can not have default value
+            if (!$parameter->isVariadic() && $parameter->isOptional()) {
+                $signature .= ' = null';
+            }
             // defaultValue
             if ($parameter->isDefaultValueAvailable()) {
                 $signature .= ' = ';
