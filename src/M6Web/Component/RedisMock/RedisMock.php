@@ -2,6 +2,7 @@
 
 namespace M6Web\Component\RedisMock;
 
+use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use RuntimeException;
 
@@ -811,12 +812,8 @@ class RedisMock
     /**
      * @throws UnsupportedException
      */
-    public function hdel($key, $fields)
+    public function hdel($key, $fields, ...$otherFields)
     {
-        if (func_num_args() > 2) {
-            throw new UnsupportedException('In RedisMock, `hdel` command does not accept more than two arguments.');
-        }
-
         if (isset(self::$dataValues[$this->storage][$key]) && !is_array(self::$dataValues[$this->storage][$key])) {
             return $this->returnPipedInfo(null);
         }
@@ -826,6 +823,7 @@ class RedisMock
         }
 
         $fields = is_array($fields) ? $fields : [$fields];
+        $fields = array_merge($fields, Arr::flatten($otherFields));
         $info = 0;
 
         foreach ($fields as $field) {
