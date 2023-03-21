@@ -294,14 +294,24 @@ class RedisMock
         }
 
         $deletedKeyCount = 0;
-        foreach ($keys as $k) {
-            if (isset(self::$dataValues[$this->storage][$k])) {
-                $deletedKeyCount += is_array(self::$dataValues[$this->storage][$k]) ? count(self::$dataValues[$this->storage][$k]) : 1;
-                unset(self::$dataValues[$this->storage][$k]);
-                unset(self::$dataTypes[$this->storage][$k]);
-                if (array_key_exists($k, self::$dataTtl[$this->storage])) {
-                    unset(self::$dataTtl[$this->storage][$k]);
+        // create a clouser to delete the key
+        $remover = function ($key) use (&$deletedKeyCount) {
+            if (isset(self::$dataValues[$this->storage][$key])) {
+                $deletedKeyCount += is_array(self::$dataValues[$this->storage][$key]) ? count(self::$dataValues[$this->storage][$key]) : 1;
+                unset(self::$dataValues[$this->storage][$key]);
+                unset(self::$dataTypes[$this->storage][$key]);
+                if (array_key_exists($key, self::$dataTtl[$this->storage])) {
+                    unset(self::$dataTtl[$this->storage][$key]);
                 }
+            }
+        };
+        foreach ($keys as $k) {
+            if (is_array($k)) {
+                foreach ($k as $key) {
+                    $remover($key);
+                }
+            } else {
+                $remover($k);
             }
         }
 
@@ -1443,7 +1453,7 @@ class RedisMock
      * @param mixed  $arguments
      * @return mixed
      */
-    public function evalsha(string $script, int $numkeys, ...$arguments): mixed
+    public function evalsha(string $script, array $arguments, int $numkeys): mixed
     {
         return null;
     }
@@ -1456,7 +1466,7 @@ class RedisMock
      * @param dynamic $arguments
      * @return mixed
      */
-    public function eval(string $script, int $numberOfKeys, ...$arguments): mixed
+    public function eval(string $script, array $arguments, int $numberOfKeys): mixed
     {
         return null;
     }

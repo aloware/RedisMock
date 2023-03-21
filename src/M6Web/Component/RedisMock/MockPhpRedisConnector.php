@@ -23,9 +23,10 @@ class MockPhpRedisConnector extends PhpRedisConnector
         $formattedOptions = array_merge(
             ['timeout' => 10.0], $options, Arr::pull($config, 'options', [])
         );
+        $storage = Arr::pull($config, 'database', '1');
 
         $factory = new RedisMockFactory();
-        $mockedRedisClass = $factory->getAdapter('Redis', true);
+        $mockedRedisClass = $factory->getAdapter('Redis', true, true, $storage);
 
         return new MockPhpRedisConnection(new $mockedRedisClass($config, $options, $formattedOptions), null, $config);
     }
@@ -42,9 +43,10 @@ class MockPhpRedisConnector extends PhpRedisConnector
     public function connectToCluster(array $config, array $clusterOptions, array $options)
     {
         $clusterSpecificOptions = Arr::pull($config, 'options', []);
+        $storage = Arr::pull($config, 'database', '1');
 
         $factory = new RedisMockFactory();
-        $redisMockClass = $factory->getAdapter('Redis', true);
+        $redisMockClass = $factory->getAdapter('Redis', true, true, $storage);
 
         return new MockPhpRedisConnector(new $redisMockClass(array_values($config), array_merge(
             $options, $clusterOptions, $clusterSpecificOptions
