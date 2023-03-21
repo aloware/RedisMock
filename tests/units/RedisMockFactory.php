@@ -13,10 +13,10 @@ class RedisMockFactory extends atoum
 
     /**
      * Test the mock
-     * 
+     *
      * @return void
      */
-    public function testMock()
+    public function testMock(): void
     {
         $factory = new Factory();
         $mock    = $factory->getAdapter('StdClass');
@@ -60,7 +60,7 @@ class RedisMockFactory extends atoum
 
     /**
      * Test the mock with a complex base class
-     * 
+     *
      * @return void
      */
     public function testMockComplex()
@@ -105,7 +105,7 @@ class RedisMockFactory extends atoum
 
     /**
      * Test method getAdpaterClass
-     * 
+     *
      * @return void
      */
     public function testGetAdapterClass()
@@ -171,7 +171,7 @@ class RedisMockFactory extends atoum
 
     /**
      * Test the mock with a base class that implement unsupported Redis commands
-     * 
+     *
      * @return void
      */
     public function testUnsupportedMock()
@@ -209,21 +209,21 @@ class RedisMockFactory extends atoum
     }
 
     /**
-     * Mock a concrete Predis Client
+     * Mock a concrete PhpRedis Client
      *
      * @return void
      */
-    public function testFailOnlyAtRuntimeWithPredis()
+    public function testFailOnlyAtRuntimeWithPhpRedis()
     {
         $factory = new Factory();
 
         $this->assert
-            ->object($factory->getAdapter('Predis\Client', true))
-                ->isInstanceOf('M6Web\Component\RedisMock\RedisMock_Predis_Client_Adapter');
+            ->object($factory->getAdapter('Redis', true))
+                ->isInstanceOf('M6Web\Component\RedisMock\RedisMock_PhpRedis_Client_Adapter');
 
         $this->assert
-            ->string($factory->getAdapterClass('Predis\Client', true))
-                ->isEqualTo('M6Web\Component\RedisMock\RedisMock_Predis_Client_Adapter_NativeConstructor');
+            ->string($factory->getAdapterClass('Redis', true))
+                ->isEqualTo('M6Web\Component\RedisMock\RedisMock_PhpRedis_Client_Adapter_NativeConstructor');
     }
 
     public function testGetAdapterWithStorageArea()
