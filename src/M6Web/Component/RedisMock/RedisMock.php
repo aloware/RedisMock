@@ -373,7 +373,6 @@ class RedisMock
 
         // return number of new members inserted
         return $this->returnPipedInfo(sizeof($newMembers));
-
     }
 
     public function sdiff($key)
@@ -398,6 +397,21 @@ class RedisMock
         }
 
         return $this->returnPipedInfo(self::$dataValues[$this->storage][$key]);
+    }
+
+    public function srandmember($key)
+    {
+        if (!isset(self::$dataValues[$this->storage][$key]) || $this->deleteOnTtlExpired($key)) {
+            return $this->returnPipedInfo(null);
+        }
+
+        $members = $this->returnPipedInfo(self::$dataValues[$this->storage][$key]);
+        if (empty($members)) {
+            return $this->returnPipedInfo(null);
+        }
+        // get a random index
+        $randomIndex = array_rand($members);
+        return $this->returnPipedInfo(self::$dataValues[$this->storage][$key][$randomIndex]);
     }
 
     public function sunion($key)
